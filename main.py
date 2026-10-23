@@ -12,11 +12,12 @@ def main() -> None:
 
         for key, value in content.items():
             guild = None
-            if value["guild"] is not None:
-                guild, guild_bool = Guild.objects.get_or_create(
-                    name=value["guild"]["name"],
+            guild_data = value.get("guild")
+            if guild_data is not None:
+                guild, _ = Guild.objects.get_or_create(
+                    name=guild_data["name"],
                     defaults={
-                        "description": value["guild"]["description"],
+                        "description": guild_data["description"],
                     },
                 )
 
@@ -45,7 +46,3 @@ def main() -> None:
                     "guild": guild,
                 },
             )
-
-
-if __name__ == "__main__":
-    main()
