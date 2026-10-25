@@ -7,42 +7,41 @@ from db.models import Race, Skill, Player, Guild
 
 def main() -> None:
     with open("players.json", "r") as file:
-        content_json = file.read()
-        content = json.loads(content_json)
+        content = json.load(file)
 
-        for key, value in content.items():
-            guild = None
-            guild_data = value.get("guild")
-            if guild_data is not None:
-                guild, _ = Guild.objects.get_or_create(
-                    name=guild_data["name"],
-                    defaults={
-                        "description": guild_data["description"],
-                    },
-                )
-
-            race, bool_value = Race.objects.get_or_create(
-                name=value["race"]["name"],
+    for key, value in content.items():
+        guild = None
+        guild_data = value.get("guild")
+        if guild_data is not None:
+            guild, _ = Guild.objects.get_or_create(
+                name=guild_data["name"],
                 defaults={
-                    "description": value["race"]["description"],
+                    "description": guild_data["description"],
                 },
             )
 
-            for skill_data in value["race"]["skills"]:
-                Skill.objects.get_or_create(
-                    name=skill_data["name"],
-                    defaults={
-                        "bonus": skill_data["bonus"],
-                        "race": race,
-                    },
-                )
+        race, _ = Race.objects.get_or_create(
+            name=value["race"]["name"],
+            defaults={
+                "description": value["race"]["description"],
+            },
+        )
 
-            Player.objects.get_or_create(
-                nickname=key,
+        for skill_data in value["race"]["skills"]:
+            Skill.objects.get_or_create(
+                name=skill_data["name"],
                 defaults={
-                    "email": value["email"],
-                    "bio": value["bio"],
+                    "bonus": skill_data["bonus"],
                     "race": race,
-                    "guild": guild,
                 },
             )
+
+        Player.objects.get_or_create(
+            nickname=key,
+            defaults={
+                "email": value["email"],
+                "bio": value["bio"],
+                "race": race,
+                "guild": guild,
+            },
+        )
